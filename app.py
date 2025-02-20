@@ -1,9 +1,13 @@
 import os
 import aiohttp
 import asyncio
+
 from synology_dsm import SynologyDSM, exceptions
+from synology_dsm.helpers import SynoFormatHelper
+
 from prometheus_client import start_http_server, Gauge, Info, Enum
 from time import sleep
+
 
 prometheus_prefix = "syno"
 
@@ -92,8 +96,11 @@ def set_shares(api: SynologyDSM, share_size_used_gauge, share_size_quota_gauge):
     for share in api.share.shares:
         # external drives are not supported, so exclude them
         if share.get("share_quota_used"):
-            share_size_used_gauge.labels(share.get("uuid"), share.get("name")).set(share.get("share_quota_used"))
-            share_size_quota_gauge.labels(share.get("uuid"), share.get("name")).set(share.get("quota_value"))
+            size = SynoFormatHelper.megabytes_to_bytes(share.get("share_quota_used", 0))
+            quota = SynoFormatHelper.megabytes_to_bytes(share.get("quota_value", 0))
+
+            share_size_used_gauge.labels(share.get("uuid"), share.get("name")).set(size)
+            share_size_quota_gauge.labels(share.get("uuid"), share.get("name")).set(quota)
 
 async def main():
     verify = os.getenv('SYNOLOGY_VERIFY_SSL', 'false').lower() in ('true', '1')
