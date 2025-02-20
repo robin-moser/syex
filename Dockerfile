@@ -1,23 +1,14 @@
-FROM python:3.7-alpine
+FROM python:3.12-alpine
 
-LABEL maintainer="Erik <erikvlilja+syex@gmail.com>"
+LABEL maintainer="Robin Moser"
+WORKDIR /app
 
-RUN apk add curl && \
-		curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - && \
-		apk del curl
-
-ENV PATH="/root/.poetry/bin:${PATH}"
-
-RUN mkdir /app
+RUN pip install poetry==2.0.1
 
 COPY pyproject.toml /app/
 COPY poetry.lock /app/
 
-WORKDIR /app
-
-
-RUN poetry install \
-    && rm -rf ~/.config/pypoetry
+RUN poetry install --no-cache --no-interaction --no-ansi
 
 COPY . /app
 
