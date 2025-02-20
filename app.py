@@ -1,4 +1,5 @@
 import os
+import sys
 import aiohttp
 import asyncio
 
@@ -18,7 +19,7 @@ disk_states = ["normal","error"]
 def require_environmental_variable(variable_name):
     if variable_name not in os.environ.keys():
         print('Variable {} missing.'.format(variable_name))
-        exit(1)
+        sys.exit(1)
     return os.environ[variable_name]
 
 
@@ -167,7 +168,7 @@ async def do(session: aiohttp.ClientSession):
 
         except exceptions.SynologyDSMRequestException as e:
             print( "The Module couldn't reach the Synology API:", e)
-            exit(1)
+            sys.exit(1)
 
         set_metadata(api, metadata_info)
         set_usage(api, temp_gauge, uptime_gauge, cpu_gauge)
