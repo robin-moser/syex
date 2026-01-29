@@ -96,7 +96,7 @@ def set_disks(api: SynologyDSM, smart_status_enum, disk_status_enum, disk_temp_g
 def set_shares(api: SynologyDSM, share_size_used_gauge, share_size_quota_gauge):
     for share in api.share.shares:
         # external drives are not supported, so exclude them
-        if share.get("share_quota_used"):
+        if "share_quota_used" in share:
             size = SynoFormatHelper.megabytes_to_bytes(share.get("share_quota_used", 0))
             quota = SynoFormatHelper.megabytes_to_bytes(share.get("quota_value", 0))
 
